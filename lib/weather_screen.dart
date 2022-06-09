@@ -3,11 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 
 import 'package:kick_weather/weather_calls.dart';
+import 'package:kick_weather/widgets.dart';
 
 class WeatherScreen extends StatefulWidget {
 
   final dynamic weatherData;
-  const WeatherScreen({Key? key, required this.weatherData}) : super(key: key);
+  final String background;
+  final Color colour;
+
+  const WeatherScreen({
+    Key? key,
+    required this.weatherData,
+    required this.background,
+    required this.colour
+  }) : super(key: key);
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();
@@ -17,14 +26,61 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   TextEditingController searchController = TextEditingController();
   late String cityName;
+  dynamic weather;
+  late Color color;
 
-  Future queryWeather () async {
-    return await QueryWeather(url: 'q=$cityName').queryWeather();
+  String background = '';
+
+  Future queryWeather (String city) async {
+    return await QueryWeather(url: 'q=$city').queryWeather();
+  }
+
+  void weatherModel (dynamic weather){
+    int id = weather['weather'][0]['id'];
+
+    if (id > 800){
+      //Clouds
+      background = 'assets/images/cloudy.jpg';
+      color = Colors.black;
+    }
+    else if (id == 800){
+      //clear sky
+      background = 'assets/images/clear_sky.jpg';
+      color = Colors.white70;
+    }
+    else if (id >= 700){
+      //Atmosphere
+      background = 'assets/images/atmosphere.jpg';
+      color = Colors.black;
+    }
+    else if (id >= 600){
+      //Snow
+      background = 'assets/images/snow.jpg';
+      color = Colors.black;
+    }
+    else if (id >= 500){
+      //Rain
+      background = 'assets/images/rain.jpg';
+      color = Colors.white70;
+    }
+    else if (id >= 300){
+      //Drizzle
+      background = 'assets/images/drizzle.jpg';
+      color = Colors.white70;
+    }
+    else if (id >= 200){
+      //Thunderstorm
+      background = 'assets/images/thunderstorm.png';
+      color = Colors.white70;
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    weather = widget.weatherData;
+    background = widget.background;
+    color = widget.colour;
   }
 
   @override
@@ -37,190 +93,182 @@ class _WeatherScreenState extends State<WeatherScreen> {
   Widget build(BuildContext context) {
 
     Size mediaQuery = MediaQuery.of(context).size;
-    dynamic weather = widget.weatherData;
     final double temp = weather['main']['temp'];
 
     return Scaffold(
-      //TODO:BACKGROUND IMAGE
-      body: Padding(
-        padding: EdgeInsets.only(
-          top: mediaQuery.height * 0.06,
-          left: mediaQuery.width * 0.06,
-          right: mediaQuery.width * 0.09,
-          bottom: mediaQuery.height * 0.04,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              background,
+            ),
+            fit: BoxFit.cover,
+          ),
         ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: mediaQuery.height * 0.06,
+            left: mediaQuery.width * 0.06,
+            right: mediaQuery.width * 0.09,
+            bottom: mediaQuery.height * 0.04,
+          ),
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
 
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 8.0,
-                  ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 8.0,
+                    ),
 
-                  //current + city search
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //current + city search
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    children: [
-
-                      //search city
-                      AnimSearchBar(
-                        width: mediaQuery.width * 0.72,
-                        textController: searchController,
-                        helpText: 'Search City',
-
-                        suffixIcon: const Icon(
-                          Icons.check_outlined,
-                        ),
-
-                        onSuffixTap: () async {
-                          cityName = searchController.text;
-
-                          //query city weather
-                          weather = await queryWeather();
-
-                          setState(() {
-                            searchController.clear();
-                          });
-
-                          //close keyboard
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                      ),
-
-                      //current location
-                      IconButton(
-                        icon: const Icon(
-                          Icons.gps_fixed_outlined,
-                        ),
-
-                        onPressed: (){
-                          //query current weather
-                          setState(() {
-                            weather = widget.weatherData;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                //city, temperature and weather
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //city and temp
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        Text(
-                          weather['name'],
-                          style: const TextStyle(
-                            fontSize: 19.0,
+                        //search city
+                        AnimSearchBar(
+                          width: mediaQuery.width * 0.72,
+                          textController: searchController,
+                          helpText: 'Search City',
+                          closeSearchOnSuffixTap: true,
+
+                          suffixIcon: const Icon(
+                            Icons.check_outlined,
                           ),
+
+                          onSuffixTap: () async {
+                            cityName = searchController.text;
+
+                            //query city weather
+                            if(cityName.isNotEmpty){
+                              weather = await queryWeather(cityName);
+                              weatherModel(weather);
+                            }
+
+                            setState(() {
+                              searchController.clear();
+
+                              //close keyboard
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            });
+                          },
                         ),
 
-                        Text(
-                          '${temp.round()}°',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 120.0,
-                            letterSpacing: -12.0,
+                        //current location
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.gps_fixed_outlined,
+                            ),
+
+                            onPressed: (){
+                              //query current weather
+                              setState(() {
+                                weather = widget.weatherData;
+                                weatherModel(weather);
+                              });
+                            },
                           ),
                         ),
                       ],
                     ),
-
-                    //weather
-                    RotatedBox(
-                      quarterTurns: -1,
-                      child: Text(
-                        weather['weather'][0]['description'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            //weather details
-            Container(
-              height: mediaQuery.height * 0.08,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                color: Colors.black.withOpacity(0.05),
-                border: Border.all(
-                  color: Colors.black,
-                ),
-              ),
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-
-                  //humidity
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${weather['main']['humidity']}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const Text(
-                        'Humidity',
-                      ),
-                    ],
                   ),
 
-                  //Pressure
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  //city, temperature and weather
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${weather['main']['pressure']}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                      //city and temp
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Text(
+                            weather['name'],
+                            style: TextStyle(
+                              fontSize: 19.0,
+                              color: color,
+                            ),
+                          ),
+
+                          Text(
+                            '${temp.round()}°',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 120.0,
+                              letterSpacing: -10.0,
+                              color: color,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      //weather
+                      RotatedBox(
+                        quarterTurns: -1,
+                        child: Text(
+                          weather['weather'][0]['description'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                            color: color,
+                          ),
                         ),
-                      ),
-
-                      const Text(
-                        'Pressure',
-                      ),
-                    ],
-                  ),
-
-                  //Visibility
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${weather['visibility']}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const Text(
-                        'Visibility',
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-          ],
+
+              //weather details
+              Container(
+                height: mediaQuery.height * 0.08,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color: color.withOpacity(0.05),
+                  border: Border.all(
+                    color: color,
+                  ),
+                ),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+
+                    //humidity
+                    weatherDetail(
+                      detail: '${weather['main']['humidity']}',
+                      label: 'Humidity',
+                      colour: color,
+                    ),
+
+                    //Pressure
+                    weatherDetail(
+                      detail: '${weather['main']['pressure']}',
+                      label: 'Pressure',
+                      colour: color,
+                    ),
+
+                    //Visibility
+                    weatherDetail(
+                      detail: '${weather['visibility']}',
+                      label: 'Visibility',
+                      colour: color,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

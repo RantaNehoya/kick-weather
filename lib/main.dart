@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kick_weather/search_city_screen.dart';
-import 'package:kick_weather/weather_screen.dart';
 
 import 'load_screen.dart';
 
@@ -13,13 +11,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return const MaterialApp(
+      title: 'KickWeather',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoadScreen(),
+      home: LoadScreen(),
     );
   }
 }
