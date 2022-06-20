@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => WeatherModel(),
       child: const MaterialApp(
-        title: 'KickWeather',
+        title: 'Kick Weather',
         debugShowCheckedModeBanner: false,
         home: LoadScreen(),
       ),

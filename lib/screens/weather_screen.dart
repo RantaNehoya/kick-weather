@@ -24,15 +24,15 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen> {
 
-  TextEditingController searchController = TextEditingController();
-  bool isBannerAdLoaded = false;
-  final int dayIndex = DateTime.now().weekday;
+  // TextEditingController searchController = TextEditingController();
+  bool _isBannerAdLoaded = false;
+  final int _dayIndex = DateTime.now().weekday;
   late BannerAd _bannerAd;
-  late String cityName;
-  late int currDay;
-  dynamic weather;
+  // late String cityName;
+  late int _currDay;
+  dynamic _weather;
 
-  Map<int, String> days = const {
+  final Map<int, String> _days = const {
     1: 'Mon',
     2: 'Tue',
     3: 'Wed',
@@ -42,23 +42,23 @@ class _WeatherScreenState extends State<WeatherScreen> {
     7: 'Sun',
   };
 
-  int dayEval (int day){
+  int _dayEval (int day){
 
-    if((dayIndex+day) > 7){
-      currDay += 1;
-      return currDay;
+    if((_dayIndex+day) > 7){
+      _currDay += 1;
+      return _currDay;
     }
     else {
-      currDay = 0;
-      return dayIndex+day;
+      _currDay = 0;
+      return _dayIndex+day;
     }
   }
 
-  Future queryWeather (String city) async {
-    return await QueryWeather(url: 'q=$city').queryWeather();
-  }
+  // Future queryWeather (String city) async {
+  //   return await QueryWeather(url: 'q=$city').queryWeather();
+  // }
 
-  void bottomBannerAd (){
+  void _bottomBannerAd (){
     _bannerAd = BannerAd(
       size: AdSize.fullBanner,
       adUnitId: BannerAdverts.bannerAdUnitId,
@@ -66,7 +66,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
       listener: BannerAdListener(
         onAdLoaded: (_){
           setState(() {
-            isBannerAdLoaded = true;
+            _isBannerAdLoaded = true;
           });
         },
 
@@ -82,14 +82,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   void initState() {
     super.initState();
-    weather = widget.weatherData;
-    currDay = 0;
-    bottomBannerAd();
+    _weather = widget.weatherData;
+    _currDay = 0;
+    _bottomBannerAd();
   }
 
   @override
   void dispose() {
-    searchController.dispose();
+    // searchController.dispose();
     _bannerAd.dispose();
     super.dispose();
   }
@@ -104,7 +104,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     // WeatherModel weathermodel = Provider.of<WeatherModel>(context, listen: false);
 
     return Scaffold(
-      bottomNavigationBar: isBannerAdLoaded ?
+      bottomNavigationBar: _isBannerAdLoaded ?
       SizedBox(
         height: _bannerAd.size.height.toDouble(),
         width: _bannerAd.size.width.toDouble(),
@@ -214,7 +214,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         children: [
 
                           Text(
-                            weather['timezone'],
+                            _weather['timezone'],
                             style: TextStyle(
                               fontSize: 19.0,
                               color: colour,
@@ -222,7 +222,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           ),
 
                           Text(
-                            '${weather['current']['temp'].round()}°',
+                            '${_weather['current']['temp'].round()}°',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 120.0,
@@ -237,7 +237,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       RotatedBox(
                         quarterTurns: -1,
                         child: Text(
-                          weather['current']['weather'][0]['description'],
+                          _weather['current']['weather'][0]['description'],
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18.0,
@@ -268,34 +268,34 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     children: [
 
                       weatherForecast(
-                        day: '${days[dayIndex]}',
-                        temp: '${weather['current']['temp']}°',
-                        humidity: 'Humidity - ${weather['current']['humidity']}',
-                        pressure: 'Pressure - ${weather['current']['pressure']}',
+                        day: '${_days[_dayIndex]}',
+                        temp: '${_weather['current']['temp']}°',
+                        humidity: 'Humidity - ${_weather['current']['humidity']}',
+                        pressure: 'Pressure - ${_weather['current']['pressure']}',
                         colour: colour.withOpacity(0.05),
                       ),
 
                       weatherForecast(
-                        day: '${days[dayEval(1)]}',
-                        temp: '${weather['daily'][0]['temp']['day'].round()}°',
-                        humidity: 'Humidity - ${weather['daily'][0]['humidity']}',
-                        pressure: 'Pressure - ${weather['daily'][0]['pressure']}',
+                        day: '${_days[_dayEval(1)]}',
+                        temp: '${_weather['daily'][0]['temp']['day'].round()}°',
+                        humidity: 'Humidity - ${_weather['daily'][0]['humidity']}',
+                        pressure: 'Pressure - ${_weather['daily'][0]['pressure']}',
                         colour: colour.withOpacity(0.05),
                       ),
 
                       weatherForecast(
-                        day: '${days[dayEval(2)]}',
-                        temp: '${weather['daily'][1]['temp']['day'].round()}°',
-                        humidity: 'Humidity - ${weather['daily'][1]['humidity']}',
-                        pressure: 'Pressure - ${weather['daily'][1]['pressure']}',
+                        day: '${_days[_dayEval(2)]}',
+                        temp: '${_weather['daily'][1]['temp']['day'].round()}°',
+                        humidity: 'Humidity - ${_weather['daily'][1]['humidity']}',
+                        pressure: 'Pressure - ${_weather['daily'][1]['pressure']}',
                         colour: colour.withOpacity(0.05),
                       ),
 
                       weatherForecast(
-                        day: '${days[dayEval(3)]}',
-                        temp: '${weather['daily'][2]['temp']['day'].round()}°',
-                        humidity: 'Humidity - ${weather['daily'][2]['humidity']}',
-                        pressure: 'Pressure - ${weather['daily'][2]['pressure']}',
+                        day: '${_days[_dayEval(3)]}',
+                        temp: '${_weather['daily'][2]['temp']['day'].round()}°',
+                        humidity: 'Humidity - ${_weather['daily'][2]['humidity']}',
+                        pressure: 'Pressure - ${_weather['daily'][2]['pressure']}',
                         colour: colour.withOpacity(0.05),
                       ),
                     ],

@@ -15,16 +15,16 @@ class LoadScreen extends StatefulWidget {
 }
 
 class _LoadScreenState extends State<LoadScreen> {
-  WeatherApi weather = WeatherApi();
-  late dynamic data;
+  final WeatherApi _weather = WeatherApi();
+  late dynamic _data;
 
   void newScreen() async {
-    data = await weather.getCurrentLocation();
-    Provider.of<WeatherModel>(context, listen: false).weatherModel(data);
+    _data = await _weather.getCurrentLocation();
+    Provider.of<WeatherModel>(context, listen: false).weatherModel(_data);
 
     Navigator.push(
       context, MaterialPageRoute(builder: (context) => WeatherScreen(
-      weatherData: data,
+      weatherData: _data,
     ),
     ),
     );
@@ -39,7 +39,7 @@ class _LoadScreenState extends State<LoadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF131313),
+      backgroundColor: const Color(0xFF131313),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -53,7 +53,7 @@ class _LoadScreenState extends State<LoadScreen> {
           ),
 
           const Text(
-            'KickWeather',
+            'Kick Weather',
             style: TextStyle(
               fontSize: 30.0,
               fontWeight: FontWeight.bold,
