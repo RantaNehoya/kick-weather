@@ -252,7 +252,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
               //weather details
               Container(
-                height: mediaQuery.height * 0.15,
+                height: 130.0,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
                   color: colour.withOpacity(0.05),
@@ -269,7 +269,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                       weatherForecast(
                         day: '${_days[_dayIndex]}',
-                        temp: '${_weather['current']['temp']}°',
+                        temp: '${_weather['current']['temp'].round()}°',
                         humidity: 'Humidity - ${_weather['current']['humidity']}',
                         pressure: 'Pressure - ${_weather['current']['pressure']}',
                         colour: colour.withOpacity(0.05),
