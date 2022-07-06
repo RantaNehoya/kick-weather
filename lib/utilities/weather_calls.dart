@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 class QueryWeather {
-  final _apiKey = 'c244c1654d84b66db6f88282873dc501';
+  final _apiKey = '###';
   final String url;
 
   QueryWeather({required this.url});
